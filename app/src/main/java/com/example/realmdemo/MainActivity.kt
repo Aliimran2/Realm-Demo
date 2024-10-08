@@ -1,18 +1,20 @@
 package com.example.realmdemo
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.realmdemo.databinding.ActivityMainBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class MainActivity : AppCompatActivity(), StudentAdapter.OnItemClickListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var studentAdapter: StudentAdapter
-    private val studentViewModel : StudentViewModel by viewModels {
+    private val studentViewModel: StudentViewModel by viewModels {
         StudentViewModelFactory(StudentRepository())
     }
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,8 +23,8 @@ class MainActivity : AppCompatActivity(), StudentAdapter.OnItemClickListener {
         setContentView(binding.root)
 
 
-        studentViewModel.students.observe(this){students ->
-            studentAdapter = StudentAdapter(students, this )
+        studentViewModel.students.observe(this) { students ->
+            studentAdapter = StudentAdapter(students, this)
             binding.rvStudent.adapter = studentAdapter
         }
 
@@ -35,7 +37,6 @@ class MainActivity : AppCompatActivity(), StudentAdapter.OnItemClickListener {
         }
 
 
-
     }
 
     override fun onEditClick(student: Student) {
@@ -43,7 +44,17 @@ class MainActivity : AppCompatActivity(), StudentAdapter.OnItemClickListener {
         editStu.show(supportFragmentManager, null)
     }
 
-    override fun onDeleteClick(id : String) {
-        studentViewModel.deleteStudent(id)
+    override fun onDeleteClick(id: String) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Delete?")
+            .setMessage("Do you really want to delete")
+            .setPositiveButton("Delete") { d, _ ->
+                studentViewModel.deleteStudent(id)
+                Toast.makeText(this, "Record Deleted", Toast.LENGTH_SHORT).show()
+                d.dismiss()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+
     }
 }
